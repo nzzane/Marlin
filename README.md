@@ -1,3 +1,12 @@
+============================================================================
+
+Configured for Tarantula Pro with E3D Hemera, TMC2208 UART & NEOPixel LED's
+
+Any questions, your best bet is to ask in the Tevo Tarantuala Facebook group at https://www.facebook.com/groups/TEVO.3dprinter.owners/.)
+
+Thanks!
+
+============================================================================
 # Marlin 3D Printer Firmware
 
 ![GitHub](https://img.shields.io/github/license/marlinfirmware/marlin.svg)
