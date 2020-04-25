@@ -25,7 +25,9 @@
 
 #if ENABLED(SDSUPPORT)
 
-#define SD_RESORT BOTH(SDCARD_SORT_ALPHA, SDSORT_DYNAMIC_RAM)
+#if BOTH(SDCARD_SORT_ALPHA, SDSORT_DYNAMIC_RAM)
+  #define SD_RESORT 1
+#endif
 
 #define MAX_DIR_DEPTH     10       // Maximum folder depth
 #define MAXDIRNAMELENGTH   8       // DOS folder name size
@@ -73,6 +75,9 @@ public:
   static inline bool isMounted() { return flag.mounted; }
   static void ls();
 
+  // Handle media insert/remove
+  static void manage_media();
+
   // SD Card Logging
   static void openLogFile(char * const path);
   static void write_command(char * const buf);
@@ -106,15 +111,11 @@ public:
 
   // Print job
   static void openAndPrintFile(const char *name);   // (working directory)
-  static void printingHasFinished();
+  static void fileHasFinished();
   static void getAbsFilename(char *dst);
-  static void startFileprint();
   static void printFilename();
-  static void stopSDPrint(
-    #if SD_RESORT
-      const bool re_sort=false
-    #endif
-  );
+  static void startFileprint();
+  static void endFilePrint(TERN_(SD_RESORT, const bool re_sort=false));
   static void report_status();
   static inline void pauseSDPrint() { flag.sdprinting = false; }
   static inline bool isPaused() { return isFileOpen() && !flag.sdprinting; }
@@ -275,11 +276,7 @@ private:
 #if ENABLED(USB_FLASH_DRIVE_SUPPORT)
   #define IS_SD_INSERTED() Sd2Card::isInserted()
 #elif PIN_EXISTS(SD_DETECT)
-  #if ENABLED(SD_DETECT_INVERTED)
-    #define IS_SD_INSERTED()  READ(SD_DETECT_PIN)
-  #else
-    #define IS_SD_INSERTED() !READ(SD_DETECT_PIN)
-  #endif
+  #define IS_SD_INSERTED() (READ(SD_DETECT_PIN) == SD_DETECT_STATE)
 #else
   // No card detect line? Assume the card is inserted.
   #define IS_SD_INSERTED() true
