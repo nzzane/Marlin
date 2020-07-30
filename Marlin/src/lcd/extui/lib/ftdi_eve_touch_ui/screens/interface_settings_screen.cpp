@@ -17,7 +17,7 @@
  *   GNU General Public License for more details.                           *
  *                                                                          *
  *   To view a copy of the GNU General Public License, go to the following  *
- *   location: <http://www.gnu.org/licenses/>.                              *
+ *   location: <https://www.gnu.org/licenses/>.                              *
  ****************************************************************************/
 
 #include "../config.h"
@@ -161,7 +161,7 @@ void InterfaceSettingsScreen::onIdle() {
     CommandProcessor cmd;
     switch (cmd.track_tag(value)) {
       case 2:
-        screen_data.InterfaceSettingsScreen.brightness = constrain((value * 128UL) / 0xFFFF, 1, 11);
+        screen_data.InterfaceSettingsScreen.brightness = max(11, (value * 128UL) / 0xFFFF);
         CLCD::set_brightness(screen_data.InterfaceSettingsScreen.brightness);
         SaveSettingsDialogBox::settingsChanged();
         break;

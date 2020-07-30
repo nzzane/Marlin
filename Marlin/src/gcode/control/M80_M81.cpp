@@ -16,7 +16,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
 
@@ -72,9 +72,9 @@
     #endif
 
     #if DISABLED(AUTO_POWER_CONTROL)
-      delay(PSU_POWERUP_DELAY);
+      safe_delay(PSU_POWERUP_DELAY);
       restore_stepper_drivers();
-      TERN_(HAS_TRINAMIC_CONFIG, delay(PSU_POWERUP_DELAY));
+      TERN_(HAS_TRINAMIC_CONFIG, safe_delay(PSU_POWERUP_DELAY));
     #endif
 
     TERN_(HAS_LCD_MENU, ui.reset_status());
@@ -92,7 +92,7 @@ void GcodeSuite::M81() {
   print_job_timer.stop();
   planner.finish_and_disable();
 
-  #if FAN_COUNT > 0
+  #if HAS_FAN
     thermalManager.zero_fan_speeds();
     #if ENABLED(PROBING_FANS_OFF)
       thermalManager.fans_paused = false;
