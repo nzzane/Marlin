@@ -16,7 +16,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
 #pragma once
@@ -36,7 +36,7 @@
  * Advanced settings can be found in Configuration_adv.h
  *
  */
-#define CONFIGURATION_H_VERSION 020005
+#define CONFIGURATION_H_VERSION 020006
 
 //===========================================================================
 //============================= Getting Started =============================
@@ -45,13 +45,13 @@
 /**
  * Here are some standard links for getting your machine calibrated:
  *
- * http://reprap.org/wiki/Calibration
- * http://youtu.be/wAL9d7FgInk
+ * https://reprap.org/wiki/Calibration
+ * https://youtu.be/wAL9d7FgInk
  * http://calculator.josefprusa.cz
- * http://reprap.org/wiki/Triffid_Hunter%27s_Calibration_Guide
- * http://www.thingiverse.com/thing:5573
+ * https://reprap.org/wiki/Triffid_Hunter%27s_Calibration_Guide
+ * https://www.thingiverse.com/thing:5573
  * https://sites.google.com/site/repraplogphase/calibration-of-your-reprap
- * http://www.thingiverse.com/thing:298812
+ * https://www.thingiverse.com/thing:298812
  */
 
 //===========================================================================
@@ -99,6 +99,7 @@
 /**
  * Select the serial port on the board to use for communication with the host.
  * This allows the connection of wireless adapters (for instance) to non-default port pins.
+ * Serial port -1 is the USB emulated serial port, if available.
  * Note: The first serial port (-1 or 0) will always be used by the Arduino bootloader.
  *
  * :[-1, 0, 1, 2, 3, 4, 5, 6, 7]
@@ -107,9 +108,6 @@
 
 /**
  * Select a secondary serial port on the board to use for communication with the host.
- * This allows the connection of wireless adapters (for instance) to non-default port pins.
- * Serial port -1 is the USB emulated serial port, if available.
- *
  * :[-1, 0, 1, 2, 3, 4, 5, 6, 7]
  */
 #define SERIAL_PORT_2 0
@@ -137,13 +135,13 @@
 //#define CUSTOM_MACHINE_NAME "Tarantula Pro"
 
 // Printer's unique ID, used by some programs to differentiate between machines.
-// Choose your own or use a service like http://www.uuidgenerator.net/version4
+// Choose your own or use a service like https://www.uuidgenerator.net/version4
 //#define MACHINE_UUID "00000000-0000-0000-0000-000000000000"
 
 // @section extruder
 
 // This defines the number of extruders
-// :[1, 2, 3, 4, 5, 6, 7, 8]
+// :[0, 1, 2, 3, 4, 5, 6, 7, 8]
 #define EXTRUDERS 1
 
 // Generally expected filament diameter (1.75, 2.85, 3.0, ...). Used for Volumetric, Filament Width Sensor, etc.
@@ -151,6 +149,13 @@
 
 // For Cyclops or any "multi-extruder" that shares a single nozzle.
 //#define SINGLENOZZLE
+
+// Save and restore temperature and fan speed on tool-change.
+// Set standby for the unselected tool with M104/106/109 T...
+#if ENABLED(SINGLENOZZLE)
+  //#define SINGLENOZZLE_STANDBY_TEMP
+  //#define SINGLENOZZLE_STANDBY_FAN
+#endif
 
 /**
  * Průša MK2 Single Nozzle Multi-Material Multiplexer, and variants.
@@ -368,6 +373,7 @@
  *     4 : 10k thermistor !! do not use it for a hotend. It gives bad resolution at high temp. !!
  *     5 : 100K thermistor - ATC Semitec 104GT-2/104NT-4-R025H42G (Used in ParCan, J-Head, and E3D) (4.7k pullup)
  *   501 : 100K Zonestar (Tronxy X3A) Thermistor
+ *   502 : 100K Zonestar Thermistor used by hot bed in Zonestar Prusa P802M
  *   512 : 100k RPW-Ultra hotend thermistor (4.7k pullup)
  *     6 : 100k EPCOS - Not as accurate as table 1 (created using a fluke thermocouple) (4.7k pullup)
  *     7 : 100k Honeywell thermistor 135-104LAG-J01 (4.7k pullup)
@@ -382,6 +388,8 @@
  *    18 : ATC Semitec 204GT-2 (4.7k pullup) Dagoma.Fr - MKS_Base_DKU001327
  *    20 : Pt100 with circuit in the Ultimainboard V2.x with 5v excitation (AVR)
  *    21 : Pt100 with circuit in the Ultimainboard V2.x with 3.3v excitation (STM32 \ LPC176x....)
+ *    22 : 100k (hotend) with 4.7k pullup to 3.3V and 220R to analog input (as in GTM32 Pro vB)
+ *    23 : 100k (bed) with 4.7k pullup to 3.3v and 220R to analog input (as in GTM32 Pro vB)
  *   201 : Pt100 with circuit in Overlord, similar to Ultimainboard V2.x
  *    60 : 100k Maker's Tool Works Kapton Bed Thermistor beta=3950
  *    61 : 100k Formbot / Vivedino 3950 350C thermistor 4.7k pullup
@@ -465,23 +473,18 @@
 //===========================================================================
 //============================= PID Settings ================================
 //===========================================================================
-// PID Tuning Guide here: http://reprap.org/wiki/PID_Tuning
-
+// PID Tuning Guide here: https://reprap.org/wiki/PID_Tuning
 // Comment the following line to disable PID and enable bang-bang.
 #define PIDTEMP
 #define BANG_MAX 255     // Limits current to nozzle while in bang-bang mode; 255=full current
 #define PID_MAX BANG_MAX // Limits current to nozzle while PID is active (see PID_FUNCTIONAL_RANGE below); 255=full current
 #define PID_K1 0.95      // Smoothing factor within any PID loop
+
 #if ENABLED(PIDTEMP)
   //#define PID_EDIT_MENU         // Add PID editing to the "Advanced Settings" menu. (~700 bytes of PROGMEM)
   //#define PID_AUTOTUNE_MENU     // Add PID auto-tuning to the "Advanced Settings" menu. (~250 bytes of PROGMEM)
-  //#define PID_DEBUG             // Sends debug data to the serial port.
-  //#define PID_OPENLOOP 1        // Puts PID in open loop. M104/M140 sets the output power from 0 to PID_MAX
-  //#define SLOW_PWM_HEATERS      // PWM with very low frequency (roughly 0.125Hz=8s) and minimum state time of approximately 1s useful for heaters driven by a relay
   //#define PID_PARAMS_PER_HOTEND // Uses separate PID parameters for each extruder (useful for mismatched extruders)
                                   // Set/get with gcode: M301 E[extruder number, 0-2]
-  #define PID_FUNCTIONAL_RANGE 10 // If the temperature difference between the target temperature and the actual temperature
-                                  // is more than PID_FUNCTIONAL_RANGE then the PID will be shut off and the heater will be set to min/max.
 
   // If you are using a pre-configured hotend then you can use one of the value sets by uncommenting it
   // E3D Hemera
@@ -554,6 +557,14 @@
   // FIND YOUR OWN: "M303 E-1 C8 S90" to run autotune on the bed at 90 degreesC for 8 cycles.
 #endif // PIDTEMPBED
 
+#if EITHER(PIDTEMP, PIDTEMPBED)
+  //#define PID_DEBUG             // Sends debug data to the serial port. Use 'M303 D' to toggle activation.
+  //#define PID_OPENLOOP          // Puts PID in open loop. M104/M140 sets the output power from 0 to PID_MAX
+  //#define SLOW_PWM_HEATERS      // PWM with very low frequency (roughly 0.125Hz=8s) and minimum state time of approximately 1s useful for heaters driven by a relay
+  #define PID_FUNCTIONAL_RANGE 10 // If the temperature difference between the target temperature and the actual temperature
+                                  // is more than PID_FUNCTIONAL_RANGE then the PID will be shut off and the heater will be set to min/max.
+#endif
+
 // @section extruder
 
 /**
@@ -564,7 +575,7 @@
  * *** IT IS HIGHLY RECOMMENDED TO LEAVE THIS OPTION ENABLED! ***
  */
 #define PREVENT_COLD_EXTRUSION
-#define EXTRUDE_MINTEMP 190
+#define EXTRUDE_MINTEMP 180
 
 /**
  * Prevent a single extrusion longer than EXTRUDE_MAXLENGTH.
@@ -703,13 +714,16 @@
  * Enable if your probe or endstops falsely trigger due to noise.
  *
  * - Higher values may affect repeatability or accuracy of some bed probes.
- * - To fix noise install a 100nF ceramic capacitor inline with the switch.
+ * - To fix noise install a 100nF ceramic capacitor in parallel with the switch.
  * - This feature is not required for common micro-switches mounted on PCBs
  *   based on the Makerbot design, which already have the 100nF capacitor.
  *
  * :[2,3,4,5,6,7]
  */
 //#define ENDSTOP_NOISE_THRESHOLD 2
+
+// Check for stuck or disconnected endstops during homing moves.
+//#define DETECT_BROKEN_ENDSTOP
 
 //=============================================================================
 //============================== Movement Settings ============================
@@ -789,6 +803,8 @@
   #define DEFAULT_YJERK 10.0
   #define DEFAULT_ZJERK  0.3
 
+  //#define TRAVEL_EXTRA_XYJERK 0.0     // Additional jerk allowance for all travel moves
+
   //#define LIMITED_JERK_EDITING        // Limit edit via M205 or LCD to DEFAULT_aJERK * 2
   #if ENABLED(LIMITED_JERK_EDITING)
     #define MAX_JERK_EDIT_VALUES { 20, 20, 0.6, 10 } // ...or, set your own edit limits
@@ -802,10 +818,12 @@
  *
  * See:
  *   https://reprap.org/forum/read.php?1,739819
- *   http://blog.kyneticcnc.com/2018/10/computing-junction-deviation-for-marlin.html
+ *   https://blog.kyneticcnc.com/2018/10/computing-junction-deviation-for-marlin.html
  */
 #if DISABLED(CLASSIC_JERK)
   #define JUNCTION_DEVIATION_MM 0.013 // (mm) Distance from real junction edge
+  #define JD_HANDLE_SMALL_SEGMENTS    // Use curvature estimation instead of just the junction angle
+                                      // for small segments (< 1mm) with large junction angles (> 135°).
 #endif
 
 /**
@@ -892,6 +910,11 @@
  * The BLTouch probe uses a Hall effect sensor and emulates a servo.
  */
 #define BLTOUCH
+
+/**
+ * Pressure sensor with a BLTouch-like interface
+ */
+//#define CREALITY_TOUCH
 
 /**
  * Touch-MI Probe by hotends.fr
@@ -1145,12 +1168,11 @@
  *
  * RAMPS-based boards use SERVO3_PIN for the first runout sensor.
  * For other boards you may need to define FIL_RUNOUT_PIN, FIL_RUNOUT2_PIN, etc.
- * By default the firmware assumes HIGH=FILAMENT PRESENT.
  */
 //#define FILAMENT_RUNOUT_SENSOR
 #if ENABLED(FILAMENT_RUNOUT_SENSOR)
   #define NUM_RUNOUT_SENSORS   1     // Number of sensors, up to one per extruder. Define a FIL_RUNOUT#_PIN for each.
-  #define FIL_RUNOUT_INVERTING false // Set to true to invert the logic of the sensor.
+  #define FIL_RUNOUT_STATE     LOW   // Pin state indicating that filament is NOT present.
   #define FIL_RUNOUT_PULLUP          // Use internal pullup for filament runout pins.
   //#define FIL_RUNOUT_PULLDOWN      // Use internal pulldown for filament runout pins.
 
@@ -1246,7 +1268,7 @@
   //#define G26_MESH_VALIDATION
   #if ENABLED(G26_MESH_VALIDATION)
     #define MESH_TEST_NOZZLE_SIZE    0.4  // (mm) Diameter of primary nozzle.
-    #define MESH_TEST_LAYER_HEIGHT   0.15  // (mm) Default layer height for the G26 Mesh Validation Tool.
+    #define MESH_TEST_LAYER_HEIGHT   0.2  // (mm) Default layer height for the G26 Mesh Validation Tool.
     #define MESH_TEST_HOTEND_TEMP  180    // (°C) Default nozzle temperature for the G26 Mesh Validation Tool.
     #define MESH_TEST_BED_TEMP      60    // (°C) Default bed temperature for the G26 Mesh Validation Tool.
     #define G26_XY_FEEDRATE         20    // (mm/s) Feedrate for XY Moves for the G26 Mesh Validation Tool.
@@ -1315,19 +1337,6 @@
 #endif // BED_LEVELING
 
 /**
- * Points to probe for all 3-point Leveling procedures.
- * Override if the automatically selected points are inadequate.
- */
-#if EITHER(AUTO_BED_LEVELING_3POINT, AUTO_BED_LEVELING_UBL)
-  //#define PROBE_PT_1_X 15
-  //#define PROBE_PT_1_Y 180
-  //#define PROBE_PT_2_X 15
-  //#define PROBE_PT_2_Y 20
-  //#define PROBE_PT_3_X 170
-  //#define PROBE_PT_3_Y 20
-#endif
-
-/**
  * Add a bed leveling sub-menu for ABL or MBL.
  * Include a guided procedure if manual probing is enabled.
  */
@@ -1355,7 +1364,6 @@
  */
 //#define Z_PROBE_END_SCRIPT "G1 Z10 F12000\nG1 X15 Y330\nG1 Z0.5\nG1 Z10"
 
-
 // @section homing
 
 // The center of the bed is at (X=0, Y=0)
@@ -1373,15 +1381,15 @@
 //
 // - Allow Z homing only after X and Y homing AND stepper drivers still enabled.
 // - If stepper drivers time out, it will need X and Y homing again before Z homing.
-// - Move the Z probe (or nozzle) to a defined XY point before Z Homing when homing all axes (G28).
+// - Move the Z probe (or nozzle) to a defined XY point before Z Homing.
 // - Prevent Z homing when the Z probe is outside bed area.
 //
 #define Z_SAFE_HOMING
 
 #if ENABLED(Z_SAFE_HOMING)
-  #define Z_SAFE_HOMING_X_POINT ((X_BED_SIZE) / 2)    // X point for Z homing when homing all axes (G28).
-  #define Z_SAFE_HOMING_Y_POINT ((Y_BED_SIZE) / 2)    // Y point for Z homing when homing all axes (G28).
-#endif
+  #define Z_SAFE_HOMING_X_POINT X_CENTER  // X point for Z homing
+  #define Z_SAFE_HOMING_Y_POINT Y_CENTER  // Y point for Z homing
+  #endif
 
 // Homing speeds (mm/m)
 #define HOMING_FEEDRATE_XY (50*60)
@@ -1494,8 +1502,8 @@
 
 // Preheat Constants
 #define PREHEAT_1_LABEL       "PLA"
-#define PREHEAT_1_TEMP_HOTEND 180
-#define PREHEAT_1_TEMP_BED     60
+#define PREHEAT_1_TEMP_HOTEND 200
+#define PREHEAT_1_TEMP_BED     55
 #define PREHEAT_1_FAN_SPEED     0 // Value from 0 to 255
 
 #define PREHEAT_2_LABEL       "ABS"
@@ -1514,12 +1522,13 @@
  *    P1  Raise the nozzle always to Z-park height.
  *    P2  Raise the nozzle by Z-park amount, limited to Z_MAX_POS.
  */
-#define NOZZLE_PARK_FEATURE
+//#define NOZZLE_PARK_FEATURE
 
 #if ENABLED(NOZZLE_PARK_FEATURE)
   // Specify a park position as { X, Y, Z_raise }
   #define NOZZLE_PARK_POINT { (X_MIN_POS + 10), (Y_MAX_POS - 10), 20 }
-    #define NOZZLE_PARK_Z_RAISE_MIN   2   // (mm) Always raise Z by at least this distance
+  //#define NOZZLE_PARK_X_ONLY          // X move only is required to park
+  //#define NOZZLE_PARK_Y_ONLY          // Y move only is required to park    #define NOZZLE_PARK_Z_RAISE_MIN   2   // (mm) Always raise Z by at least this distance
   #define NOZZLE_PARK_XY_FEEDRATE 100   // (mm/s) X and Y axes feedrate (also used for delta Z axis)
   #define NOZZLE_PARK_Z_FEEDRATE    5   // (mm/s) Z axis feedrate (not used for delta printers)
 #endif
@@ -1588,6 +1597,10 @@
 
   // Enable for a purge/clean station that's always at the gantry height (thus no Z move)
   //#define NOZZLE_CLEAN_NO_Z
+
+  // Explicit wipe G-code script applies to a G12 with no arguments.
+  //#define WIPE_SEQUENCE_COMMANDS "G1 X-17 Y25 Z10 F4000\nG1 Z1\nM114\nG1 X-17 Y25\nG1 X-17 Y95\nG1 X-17 Y25\nG1 X-17 Y95\nG1 X-17 Y25\nG1 X-17 Y95\nG1 X-17 Y25\nG1 X-17 Y95\nG1 X-17 Y25\nG1 X-17 Y95\nG1 X-17 Y25\nG1 X-17 Y95\nG1 Z15\nM400\nG0 X-10.0 Y-9.0"
+
 #endif
 
 /**
@@ -1633,9 +1646,9 @@
  * Select the language to display on the LCD. These languages are available:
  *
  *   en, an, bg, ca, cz, da, de, el, el_gr, es, eu, fi, fr, gl, hr, hu, it,
- *   jp_kana, ko_KR, nl, pl, pt, pt_br, ru, sk, tr, uk, vi, zh_CN, zh_TW, test
+ *   jp_kana, ko_KR, nl, pl, pt, pt_br, ro ru, sk, tr, uk, vi, zh_CN, zh_TW, test
  *
- * :{ 'en':'English', 'an':'Aragonese', 'bg':'Bulgarian', 'ca':'Catalan', 'cz':'Czech', 'da':'Danish', 'de':'German', 'el':'Greek', 'el_gr':'Greek (Greece)', 'es':'Spanish', 'eu':'Basque-Euskera', 'fi':'Finnish', 'fr':'French', 'gl':'Galician', 'hr':'Croatian', 'hu':'Hungarian', 'it':'Italian', 'jp_kana':'Japanese', 'ko_KR':'Korean (South Korea)', 'nl':'Dutch', 'pl':'Polish', 'pt':'Portuguese', 'pt_br':'Portuguese (Brazilian)', 'ru':'Russian', 'sk':'Slovak', 'tr':'Turkish', 'uk':'Ukrainian', 'vi':'Vietnamese', 'zh_CN':'Chinese (Simplified)', 'zh_TW':'Chinese (Traditional)', 'test':'TEST' }
+ * :{ 'en':'English', 'an':'Aragonese', 'bg':'Bulgarian', 'ca':'Catalan', 'cz':'Czech', 'da':'Danish', 'de':'German', 'el':'Greek', 'el_gr':'Greek (Greece)', 'es':'Spanish', 'eu':'Basque-Euskera', 'fi':'Finnish', 'fr':'French', 'gl':'Galician', 'hr':'Croatian', 'hu':'Hungarian', 'it':'Italian', 'jp_kana':'Japanese', 'ko_KR':'Korean (South Korea)', 'nl':'Dutch', 'pl':'Polish', 'pt':'Portuguese', 'pt_br':'Portuguese (Brazilian)', 'ro':'Romanian', 'ru':'Russian', 'sk':'Slovak', 'tr':'Turkish', 'uk':'Ukrainian', 'vi':'Vietnamese', 'zh_CN':'Chinese (Simplified)', 'zh_TW':'Chinese (Traditional)', 'test':'TEST' }
  */
 #define LCD_LANGUAGE en
 
@@ -1784,7 +1797,7 @@
 
 //
 // RepRapDiscount Smart Controller.
-// http://reprap.org/wiki/RepRapDiscount_Smart_Controller
+// https://reprap.org/wiki/RepRapDiscount_Smart_Controller
 //
 // Note: Usually sold with a white PCB.
 //
@@ -1808,13 +1821,13 @@
 
 //
 // PanelOne from T3P3 (via RAMPS 1.4 AUX2/AUX3)
-// http://reprap.org/wiki/PanelOne
+// https://reprap.org/wiki/PanelOne
 //
 //#define PANEL_ONE
 
 //
 // GADGETS3D G3D LCD/SD Controller
-// http://reprap.org/wiki/RAMPS_1.3/1.4_GADGETS3D_Shield_with_Panel
+// https://reprap.org/wiki/RAMPS_1.3/1.4_GADGETS3D_Shield_with_Panel
 //
 // Note: Usually sold with a blue PCB.
 //
@@ -1901,7 +1914,7 @@
 
 //
 // 2-wire Non-latching LCD SR from https://goo.gl/aJJ4sH
-// LCD configuration: http://reprap.org/wiki/SAV_3D_LCD
+// LCD configuration: https://reprap.org/wiki/SAV_3D_LCD
 //
 //#define SAV_3DLCD
 
@@ -1923,13 +1936,15 @@
 // IMPORTANT: The U8glib library is required for Graphical Display!
 //            https://github.com/olikraus/U8glib_Arduino
 //
+// NOTE: If the LCD is unresponsive you may need to reverse the plugs.
+//
 
 //
 // RepRapDiscount FULL GRAPHIC Smart Controller
-// http://reprap.org/wiki/RepRapDiscount_Full_Graphic_Smart_Controller
+// https://reprap.org/wiki/RepRapDiscount_Full_Graphic_Smart_Controller
 //
 //#define REPRAP_DISCOUNT_FULL_GRAPHIC_SMART_CONTROLLER
-//THIS ONE?
+
 //
 // ReprapWorld Graphical LCD
 // https://reprapworld.com/?products_details&products_id/1218
@@ -1939,20 +1954,20 @@
 //
 // Activate one of these if you have a Panucatt Devices
 // Viki 2.0 or mini Viki with Graphic LCD
-// http://panucatt.com
+// https://panucatt.com
 //
 //#define VIKI2
 //#define miniVIKI
 
 //
 // MakerLab Mini Panel with graphic
-// controller and SD support - http://reprap.org/wiki/Mini_panel
+// controller and SD support - https://reprap.org/wiki/Mini_panel
 //
 //#define MINIPANEL
 
 //
 // MaKr3d Makr-Panel with graphic controller and SD support.
-// http://reprap.org/wiki/MaKr3d_MaKrPanel
+// https://reprap.org/wiki/MaKr3d_MaKrPanel
 //
 //#define MAKRPANEL
 
@@ -1990,6 +2005,12 @@
 // https://reprap.org/wiki/MKS_MINI_12864
 //
 #define MKS_MINI_12864
+
+//
+// MKS LCD12864A/B with graphic controller and SD support. Follows MKS_MINI_12864 pinout.
+// https://www.aliexpress.com/item/33018110072.html
+//
+//#define MKS_LCD12864
 
 //
 // FYSETC variant of the MINI12864 graphic controller with SD support
@@ -2032,7 +2053,7 @@
 
 //
 // Silvergate GLCD controller
-// http://github.com/android444/Silvergate
+// https://github.com/android444/Silvergate
 //
 //#define SILVER_GATE_GLCD_CONTROLLER
 
@@ -2061,7 +2082,7 @@
 
 //
 // MKS OLED 1.3" 128 × 64 FULL GRAPHICS CONTROLLER
-// http://reprap.org/wiki/MKS_12864OLED
+// https://reprap.org/wiki/MKS_12864OLED
 //
 // Tiny, but very sharp OLED display
 //
@@ -2078,12 +2099,18 @@
 //
 //#define OVERLORD_OLED
 
+//
+// FYSETC OLED 2.42" 128 × 64 FULL GRAPHICS CONTROLLER with WS2812 RGB
+// Where to find : https://www.aliexpress.com/item/4000345255731.html
+//#define FYSETC_242_OLED_12864   // Uses the SSD1309 controller
 //=============================================================================
 //========================== Extensible UI Displays ===========================
 //=============================================================================
 
 //
 // DGUS Touch Display with DWIN OS. (Choose one.)
+// ORIGIN : https://www.aliexpress.com/item/32993409517.html
+// FYSETC : https://www.aliexpress.com/item/32961471929.html
 //
 //#define DGUS_LCD_UI_ORIGIN
 //#define DGUS_LCD_UI_FYSETC
@@ -2106,18 +2133,44 @@
 //
 //#define EXTENSIBLE_UI
 
+#if ENABLED(EXTENSIBLE_UI)
+  //#define EXTUI_LOCAL_BEEPER // Enables use of local Beeper pin with external display
+#endif
+
 //=============================================================================
 //=============================== Graphical TFTs ==============================
 //=============================================================================
 
 //
 // FSMC display (MKS Robin, Alfawise U20, JGAurora A5S, REXYZ A1, etc.)
+// Upscaled 128x64 Marlin UI
 //
 //#define FSMC_GRAPHICAL_TFT
+
+//
+// TFT LVGL UI
+//
+// Using default MKS icons and fonts from: https://git.io/JJvzK
+// Just copy the 'assets' folder from the build directory to the
+// root of your SD card, together with the compiled firmware.
+//
+//#define TFT_LVGL_UI_FSMC  // Robin nano v1.2 uses FSMC
+//#define TFT_LVGL_UI_SPI   // Robin nano v2.0 uses SPI
+
+//
+// Anycubic Mega TFT (AI3M)
+//
+//#define ANYCUBIC_TFT_MODEL
+//#define ANYCUBIC_TFT_DEBUG
 
 //=============================================================================
 //============================  Other Controllers  ============================
 //=============================================================================
+
+//
+// Ender-3 v2 OEM display. A DWIN display with Rotary Encoder.
+//
+//#define DWIN_CREALITY_LCD
 
 //
 // ADS7843/XPT2046 ADC Touchscreen such as ILI9341 2.8
@@ -2135,7 +2188,7 @@
 
 //
 // RepRapWorld REPRAPWORLD_KEYPAD v1.1
-// http://reprapworld.com/?products_details&products_id=202&cPath=1591_1626
+// https://reprapworld.com/?products_details&products_id=202&cPath=1591_1626
 //
 //#define REPRAPWORLD_KEYPAD
 //#define REPRAPWORLD_KEYPAD_MOVE_STEP 10.0 // (mm) Distance to move per key-press
@@ -2172,7 +2225,7 @@
 // then the BLUE led is on. Otherwise the RED led is on. (1C hysteresis)
 //#define TEMP_STAT_LEDS
 
-// SkeinForge sends the wrong arc g-codes when using Arc Point as fillet procedure
+// SkeinForge sends the wrong arc G-codes when using Arc Point as fillet procedure
 //#define SF_ARC_FIX
 
 // Support for the BariCUDA Paste Extruder
@@ -2185,7 +2238,6 @@
 //#define PCA9632
 
 // Support for PCA9533 PWM LED driver
-// https://github.com/mikeshub/SailfishRGB_LED
 //#define PCA9533
 
 /**
@@ -2223,7 +2275,7 @@
 // Support for Adafruit Neopixel LED driver
 #define NEOPIXEL_LED
 #if ENABLED(NEOPIXEL_LED)
-  #define NEOPIXEL_TYPE   NEO_GRB // NEO_GRBW / NEO_GRB - four/three channel driver type (defined in Adafruit_NeoPixel.h)
+  #define NEOPIXEL_TYPE   NEO_GRBW // NEO_GRBW / NEO_GRB - four/three channel driver type (defined in Adafruit_NeoPixel.h)
   #define NEOPIXEL_PIN     P1_22       // LED driving pin
   //#define NEOPIXEL2_TYPE NEOPIXEL_TYPE
   //#define NEOPIXEL2_PIN    5
